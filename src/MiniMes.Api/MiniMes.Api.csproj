@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\MiniMes.Core\MiniMes.Core.csproj" />
+    <ProjectReference Include="..\MiniMes.Data\MiniMes.Data.csproj" />
+    <ProjectReference Include="..\MiniMes.Xml\MiniMes.Xml.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+</Project>

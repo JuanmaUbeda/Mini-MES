@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9C10E3E7-9678-4AC4-8603-8848DC48EA70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Api", "src\MiniMes.Api\MiniMes.Api.csproj", "{4494053C-DCAC-4869-B799-B826B8B4601C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Core", "src\MiniMes.Core\MiniMes.Core.csproj", "{B38E6084-00CC-41C5-93F8-029B8A39CE5A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Data", "src\MiniMes.Data\MiniMes.Data.csproj", "{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.ErpSimulator", "src\MiniMes.ErpSimulator\MiniMes.ErpSimulator.csproj", "{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Xml", "src\MiniMes.Xml\MiniMes.Xml.csproj", "{45BAD605-A787-4B5C-881E-FDE54491459D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3BF8D4B4-D191-4021-9FE4-5CAF978143AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Tests", "tests\MiniMes.Tests\MiniMes.Tests.csproj", "{9CE35C82-5979-4C3A-9409-8FC8461D4917}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4494053C-DCAC-4869-B799-B826B8B4601C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4494053C-DCAC-4869-B799-B826B8B4601C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4494053C-DCAC-4869-B799-B826B8B4601C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4494053C-DCAC-4869-B799-B826B8B4601C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B38E6084-00CC-41C5-93F8-029B8A39CE5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B38E6084-00CC-41C5-93F8-029B8A39CE5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B38E6084-00CC-41C5-93F8-029B8A39CE5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B38E6084-00CC-41C5-93F8-029B8A39CE5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45BAD605-A787-4B5C-881E-FDE54491459D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45BAD605-A787-4B5C-881E-FDE54491459D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45BAD605-A787-4B5C-881E-FDE54491459D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45BAD605-A787-4B5C-881E-FDE54491459D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CE35C82-5979-4C3A-9409-8FC8461D4917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CE35C82-5979-4C3A-9409-8FC8461D4917}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CE35C82-5979-4C3A-9409-8FC8461D4917}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CE35C82-5979-4C3A-9409-8FC8461D4917}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4494053C-DCAC-4869-B799-B826B8B4601C} = {9C10E3E7-9678-4AC4-8603-8848DC48EA70}
+		{B38E6084-00CC-41C5-93F8-029B8A39CE5A} = {9C10E3E7-9678-4AC4-8603-8848DC48EA70}
+		{03298C2A-FDB0-4C23-B1F7-FD8B803ED63D} = {9C10E3E7-9678-4AC4-8603-8848DC48EA70}
+		{6B068416-B2F9-49DF-9D2D-FBCD79B6A1E1} = {9C10E3E7-9678-4AC4-8603-8848DC48EA70}
+		{45BAD605-A787-4B5C-881E-FDE54491459D} = {9C10E3E7-9678-4AC4-8603-8848DC48EA70}
+		{9CE35C82-5979-4C3A-9409-8FC8461D4917} = {3BF8D4B4-D191-4021-9FE4-5CAF978143AA}
+	EndGlobalSection
+EndGlobal
