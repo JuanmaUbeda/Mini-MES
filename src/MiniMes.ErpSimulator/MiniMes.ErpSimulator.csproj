@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Shared contract: the simulator reuses the batch XSD and validator. -->
+    <ProjectReference Include="..\MiniMes.Xml\MiniMes.Xml.csproj" />
+  </ItemGroup>
+
 </Project>

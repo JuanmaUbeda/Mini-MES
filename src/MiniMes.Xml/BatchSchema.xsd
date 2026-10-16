@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:minimes:batch:v1"
+           targetNamespace="urn:minimes:batch:v1"
+           elementFormDefault="qualified">
+
+  <!-- Batch IDs look like B-20261016-001 -->
+  <xs:simpleType name="BatchIdType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="B-\d{8}-\d{3,}" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContainerType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="A" />
+      <xs:enumeration value="B" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Created" />
+      <xs:enumeration value="Ready" />
+      <xs:enumeration value="Running" />
+      <xs:enumeration value="Completed" />
+      <xs:enumeration value="Error" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PositiveDecimalType">
+    <xs:restriction base="xs:decimal">
+      <xs:minExclusive value="0" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PercentageType">
+    <xs:restriction base="xs:decimal">
+      <xs:minExclusive value="0" />
+      <xs:maxInclusive value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NonEmptyString">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="100" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="IngredientType">
+    <xs:sequence>
+      <xs:element name="Name" type="NonEmptyString" />
+      <xs:element name="Percentage" type="PercentageType" />
+      <xs:element name="QuantityKg" type="PositiveDecimalType" />
+    </xs:sequence>
+    <xs:attribute name="container" type="ContainerType" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="RecipeType">
+    <xs:attribute name="id" type="xs:positiveInteger" use="required" />
+    <xs:attribute name="name" type="NonEmptyString" use="required" />
+  </xs:complexType>
+
+  <xs:element name="BatchOrder">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="BatchId" type="BatchIdType" />
+        <xs:element name="GeneratedAtUtc" type="xs:dateTime" />
+        <xs:element name="Source" type="NonEmptyString" />
+        <xs:element name="Recipe" type="RecipeType" />
+        <xs:element name="PlannedQuantityKg" type="PositiveDecimalType" />
+        <xs:element name="Status" type="StatusType" />
+        <xs:element name="Ingredients">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Ingredient" type="IngredientType" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

@@ -1,4 +1,4 @@
-using MiniMes.Core;
+﻿using MiniMes.Core;
 using MiniMes.Core.Models;
 
 namespace MiniMes.Tests;
@@ -43,8 +43,8 @@ public class BatchTests
         var batch = TestData.NewBatch();
 
         batch.MarkReady();
-        batch.Start();
-        batch.Complete();
+        batch.Start(DateTime.UtcNow);
+        batch.Complete(DateTime.UtcNow);
 
         Assert.Equal(BatchStatus.Completed, batch.Status);
     }
@@ -54,7 +54,7 @@ public class BatchTests
     {
         var batch = TestData.NewBatch();
 
-        Assert.Throws<DomainException>(() => batch.Start());
+        Assert.Throws<DomainException>(() => batch.Start(DateTime.UtcNow));
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class BatchTests
         var batch = TestData.NewBatch();
         batch.MarkReady();
 
-        Assert.Throws<DomainException>(() => batch.Complete());
+        Assert.Throws<DomainException>(() => batch.Complete(DateTime.UtcNow));
     }
 
     [Fact]
@@ -82,8 +82,8 @@ public class BatchTests
     {
         var batch = TestData.NewBatch();
         batch.MarkReady();
-        batch.Start();
-        batch.Complete();
+        batch.Start(DateTime.UtcNow);
+        batch.Complete(DateTime.UtcNow);
 
         Assert.Throws<DomainException>(() => batch.Fail("too late"));
     }

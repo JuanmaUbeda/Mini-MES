@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MiniMes.Core.Models;
 
 namespace MiniMes.Data;
@@ -10,6 +11,29 @@ public class MiniMesDbContext : DbContext
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<Batch> Batches => Set<Batch>();
     public DbSet<BatchEvent> BatchEvents => Set<BatchEvent>();
+    public DbSet<BatchXmlMessage> XmlMessages => Set<BatchXmlMessage>();
+    public DbSet<Tank> Tanks => Set<Tank>();
+    public DbSet<TankMovement> TankMovements => Set<TankMovement>();
+
+    // SQLite doesn't remember that a DateTime is UTC; mark every date as UTC when reading it back,
+    // so the API returns "...Z" and clients can't mistake it for local time.
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+        configurationBuilder.Properties<DateTime?>().HaveConversion<NullableUtcDateTimeConverter>();
+    }
+
+    private sealed class UtcDateTimeConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcDateTimeConverter() : base(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc)) { }
+    }
+
+    private sealed class NullableUtcDateTimeConverter : ValueConverter<DateTime?, DateTime?>
+    {
+        public NullableUtcDateTimeConverter() : base(
+            v => v,
+            v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v) { }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,6 +65,41 @@ public class MiniMesDbContext : DbContext
             e.Property(b => b.ErrorMessage).HasMaxLength(500);
             e.HasOne(b => b.Recipe).WithMany().HasForeignKey(b => b.RecipeId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(b => b.CreatedAtUtc);
+        });
+
+        modelBuilder.Entity<BatchXmlMessage>(e =>
+        {
+            e.ToTable("BatchXmlMessages");
+            e.HasKey(m => m.Id);
+            e.Property(m => m.BatchId).IsRequired().HasMaxLength(30);
+            e.Property(m => m.FileName).IsRequired().HasMaxLength(100);
+            e.Property(m => m.Xml).IsRequired();   // the full document, no length limit
+            e.Property(m => m.Result).HasConversion<string>().HasMaxLength(20);
+            e.Property(m => m.Detail).HasMaxLength(500);
+            e.HasOne<Batch>().WithMany().HasForeignKey(m => m.BatchId).OnDelete(DeleteBehavior.Cascade);
+            e.HasIndex(m => new { m.BatchId, m.CreatedAtUtc });
+        });
+
+        modelBuilder.Entity<Tank>(e =>
+        {
+            e.HasKey(t => t.Container);   // one tank per container
+            e.Property(t => t.Container).HasConversion<string>().HasMaxLength(1);
+            e.Property(t => t.MaterialName).IsRequired().HasMaxLength(100);
+            e.Property(t => t.CapacityKg).HasPrecision(10, 3);
+            e.Property(t => t.LevelKg).HasPrecision(10, 3);
+            e.Ignore(t => t.IsLow);
+        });
+
+        modelBuilder.Entity<TankMovement>(e =>
+        {
+            e.HasKey(m => m.Id);
+            e.Property(m => m.Container).HasConversion<string>().HasMaxLength(1);
+            e.Property(m => m.DeltaKg).HasPrecision(10, 3);
+            e.Property(m => m.LevelAfterKg).HasPrecision(10, 3);
+            e.Property(m => m.Reason).IsRequired().HasMaxLength(200);
+            e.Property(m => m.BatchId).HasMaxLength(30);
+            e.HasOne<Batch>().WithMany().HasForeignKey(m => m.BatchId).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(m => m.TimestampUtc);
         });
 
         modelBuilder.Entity<BatchEvent>(e =>

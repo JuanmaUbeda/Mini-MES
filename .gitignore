@@ -487,3 +487,6 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Exported batch XML files
+output/

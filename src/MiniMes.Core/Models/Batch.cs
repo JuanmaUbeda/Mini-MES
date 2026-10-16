@@ -33,15 +33,25 @@ public class Batch
     public BatchStatus Status { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
     public string? ErrorMessage { get; private set; }
+    public DateTime? StartedAtUtc { get; private set; }
+    public DateTime? CompletedAtUtc { get; private set; }
 
     // Created -> Ready: the external service accepted the batch.
     public void MarkReady() => Transition(BatchStatus.Created, BatchStatus.Ready);
 
     // Ready -> Running: the mixer started.
-    public void Start() => Transition(BatchStatus.Ready, BatchStatus.Running);
+    public void Start(DateTime startedAtUtc)
+    {
+        Transition(BatchStatus.Ready, BatchStatus.Running);
+        StartedAtUtc = startedAtUtc;
+    }
 
     // Running -> Completed: the mixer finished.
-    public void Complete() => Transition(BatchStatus.Running, BatchStatus.Completed);
+    public void Complete(DateTime completedAtUtc)
+    {
+        Transition(BatchStatus.Running, BatchStatus.Completed);
+        CompletedAtUtc = completedAtUtc;
+    }
 
     /// <summary>Any unfinished batch can fail (e.g. rejected by the external service).</summary>
     public void Fail(string reason)

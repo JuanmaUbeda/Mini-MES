@@ -1,0 +1,83 @@
+@host = http://localhost:5062
+
+### List recipes
+GET {{host}}/api/recipes
+
+### Create a valid batch (use a recipeId from the call above)
+POST {{host}}/api/batches
+Content-Type: application/json
+
+{ "recipeId": 1, "plannedQuantityKg": 200 }
+
+### Invalid: quantity above mixer capacity (expect 400)
+POST {{host}}/api/batches
+Content-Type: application/json
+
+{ "recipeId": 1, "plannedQuantityKg": 900 }
+
+### Invalid: unknown recipe (expect 400)
+POST {{host}}/api/batches
+Content-Type: application/json
+
+{ "recipeId": 999, "plannedQuantityKg": 100 }
+
+### List batches
+GET {{host}}/api/batches
+
+### Preview the XML for a batch (replace the ID)
+GET {{host}}/api/batches/B-20261016-001/xml
+
+### Send a batch to the ERP simulator (needs the simulator running on 5063)
+POST {{host}}/api/batches/B-20261016-001/submit
+
+### Detail with the event log AND the XML messages sent (use an "id" from "messages" below)
+GET {{host}}/api/batches/B-20261016-001
+
+### The XML of one stored message, exactly as it was sent
+GET {{host}}/api/messages/1/xml
+
+### --- Mixer and tank inventory ---
+
+### Start a Ready batch: doses the tanks and begins the mixer cycle (400 if a tank is short)
+POST {{host}}/api/batches/B-20261016-001/start
+
+### Simulate a fault while a batch is Running
+POST {{host}}/api/batches/B-20261016-001/fault
+
+### Tank levels
+GET {{host}}/api/tanks
+
+### Material ledger (newest first)
+GET {{host}}/api/tanks/movements?limit=20
+
+### Refill a tank (A or B), up to its 1000 kg capacity
+POST {{host}}/api/tanks/A/refill
+Content-Type: application/json
+
+{ "quantityKg": 300 }
+
+### --- ERP simulator controls (port 5063) ---
+
+### Current ERP mode and accepted batches
+GET http://localhost:5063/admin/mode
+
+### Make the ERP refuse everything (batches become Error)
+PUT http://localhost:5063/admin/mode
+Content-Type: application/json
+
+{ "mode": "RejectAll" }
+
+### Make the ERP "go down" (submit returns 503, batch stays Created)
+PUT http://localhost:5063/admin/mode
+Content-Type: application/json
+
+{ "mode": "Unavailable" }
+
+### Back to normal rules (rejects over 450 kg and duplicates)
+PUT http://localhost:5063/admin/mode
+Content-Type: application/json
+
+{ "mode": "Normal" }
+
+### Batch detail with event log (replace the ID)
+GET {{host}}/api/batches/B-20261016-001

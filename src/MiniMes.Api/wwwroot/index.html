@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mini-MES · Mixing line</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="bar">
+  <h1>Mini-MES</h1>
+  <span class="line-tag">LINE 01 · MIXING</span>
+  <span class="conn" id="conn" data-ok="unknown"><span class="dot"></span><span id="connText">Connecting…</span></span>
+</header>
+
+<main class="app">
+
+  <section class="panel overview" aria-labelledby="overviewTitle">
+    <h2 class="panel-title" id="overviewTitle">Process overview</h2>
+
+    <svg id="schematic" class="schematic" data-state="none" viewBox="0 0 640 430" role="img"
+         aria-label="Mixing line schematic. No batch selected.">
+      <defs>
+        <clipPath id="clipA"><rect x="60" y="40" width="160" height="160" rx="10"/></clipPath>
+        <clipPath id="clipB"><rect x="420" y="40" width="160" height="160" rx="10"/></clipPath>
+        <clipPath id="clipMix"><path d="M210 300 H430 V350 a50 50 0 0 1 -50 50 H260 a50 50 0 0 1 -50 -50 Z"/></clipPath>
+      </defs>
+
+      <!-- Pipes: outer wall, then an animated flow line on top -->
+      <g class="pipes" fill="none" stroke-linejoin="round">
+        <path class="pipe" d="M140 200 V262 H290 V304"/>
+        <path class="pipe" d="M500 200 V262 H350 V304"/>
+        <path class="flow" d="M140 200 V262 H290 V304"/>
+        <path class="flow" d="M500 200 V262 H350 V304"/>
+      </g>
+
+      <!-- Tank A -->
+      <g class="tank">
+        <g clip-path="url(#clipA)">
+          <rect class="tank-fill mat-a" id="fillA" x="60" y="40" width="160" height="160"/>
+        </g>
+        <rect class="vessel" id="vesselA" x="60" y="40" width="160" height="160" rx="10"/>
+        <text class="tag" x="60" y="30">TK-A</text>
+        <text class="tank-name" id="nameA" x="98" y="30">—</text>
+        <text class="tank-qty" id="kgA" x="220" y="30" text-anchor="end"></text>
+      </g>
+
+      <!-- Tank B -->
+      <g class="tank">
+        <g clip-path="url(#clipB)">
+          <rect class="tank-fill mat-b" id="fillB" x="420" y="40" width="160" height="160"/>
+        </g>
+        <rect class="vessel" id="vesselB" x="420" y="40" width="160" height="160" rx="10"/>
+        <text class="tag" x="420" y="30">TK-B</text>
+        <text class="tank-name" id="nameB" x="458" y="30">—</text>
+        <text class="tank-qty" id="kgB" x="580" y="30" text-anchor="end"></text>
+      </g>
+
+      <!-- Valves (bowtie symbol): filled when open -->
+      <g class="valve" transform="translate(140 232)">
+        <polygon points="-9,-10 9,-10 -9,10 9,10"/>
+        <text class="tag" x="16" y="4">XV-A</text>
+      </g>
+      <g class="valve" transform="translate(500 232)">
+        <polygon points="-9,-10 9,-10 -9,10 9,10"/>
+        <text class="tag" x="16" y="4">XV-B</text>
+      </g>
+
+      <!-- Mixer: trough kneader with two rotors, driven by a motor -->
+      <g class="mixer">
+        <g clip-path="url(#clipMix)">
+          <rect id="mixFill" class="mix-fill" x="210" y="300" width="220" height="100"/>
+          <g class="rotor" style="transform-origin: 285px 360px"><circle cx="285" cy="360" r="9"/><rect x="259" y="355" width="52" height="10" rx="5"/></g>
+          <g class="rotor rotor-rev" style="transform-origin: 355px 360px"><circle cx="355" cy="360" r="9"/><rect x="329" y="355" width="52" height="10" rx="5"/></g>
+        </g>
+        <path class="vessel trough" d="M210 300 H430 V350 a50 50 0 0 1 -50 50 H260 a50 50 0 0 1 -50 -50 Z"/>
+        <line class="lid" x1="204" y1="300" x2="436" y2="300"/>
+        <text class="tag" x="210" y="292">MX-01</text>
+        <line class="shaft" x1="430" y1="350" x2="446" y2="350"/>
+        <circle class="motor" cx="464" cy="350" r="18"/>
+        <text class="motor-label" x="464" y="355" text-anchor="middle">M</text>
+        <text class="fault-flag" x="320" y="426" text-anchor="middle">FAULT</text>
+      </g>
+    </svg>
+
+    <dl class="plate" id="plate" data-status="none">
+      <div class="plate-status"><dt>Status</dt><dd id="plateStatus">No batch</dd></div>
+      <div><dt>Batch</dt><dd id="plateBatch" class="mono">—</dd></div>
+      <div><dt>Recipe</dt><dd id="plateRecipe">—</dd></div>
+      <div><dt>Planned</dt><dd id="platePlanned" class="mono">—</dd></div>
+    </dl>
+    <p class="plate-note" id="plateNote" hidden></p>
+  </section>
+
+  <section class="panel inventory" aria-labelledby="invTitle">
+    <h2 class="panel-title" id="invTitle">Tank inventory</h2>
+    <div class="tanks" id="tanks"><p class="empty">Loading tank levels…</p></div>
+    <p class="msg" id="invMsg" role="status" hidden></p>
+    <h3 class="sub">Material ledger</h3>
+    <ul class="moves" id="moves"></ul>
+  </section>
+
+  <aside class="side">
+    <section class="panel" aria-labelledby="newTitle">
+      <h2 class="panel-title" id="newTitle">New batch</h2>
+      <form id="newBatch" novalidate>
+        <label for="recipe">Recipe</label>
+        <select id="recipe" required></select>
+
+        <label for="qty">Planned quantity (kg)</label>
+        <input id="qty" type="number" inputmode="decimal" min="0" max="500" step="any" placeholder="e.g. 200">
+
+        <div class="charge" id="charge" aria-live="polite">Enter a quantity to see the charge per tank.</div>
+
+        <button type="submit" class="btn primary" id="createBtn">Create batch</button>
+        <p class="msg" id="formMsg" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <section class="panel" aria-labelledby="detailTitle">
+      <h2 class="panel-title" id="detailTitle">Selected batch</h2>
+      <div id="detail"><p class="empty">No batches yet. Create the first one above.</p></div>
+    </section>
+  </aside>
+
+  <section class="panel batches" aria-labelledby="listTitle">
+    <h2 class="panel-title" id="listTitle">Batches</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Batch</th><th>Recipe</th><th class="num">Planned</th><th>Status</th><th>Created</th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">Simulation only. This application does not connect to or control any physical equipment.</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

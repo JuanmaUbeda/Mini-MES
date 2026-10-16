@@ -23,6 +23,9 @@ namespace MiniMes.Data.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("CompletedAtUtc")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("TEXT");
 
@@ -36,6 +39,9 @@ namespace MiniMes.Data.Migrations
 
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("StartedAtUtc")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -79,6 +85,45 @@ namespace MiniMes.Data.Migrations
                     b.HasIndex("BatchId", "TimestampUtc");
 
                     b.ToTable("BatchEvents");
+                });
+
+            modelBuilder.Entity("MiniMes.Core.Models.BatchXmlMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BatchId")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Detail")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Xml")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId", "CreatedAtUtc");
+
+                    b.ToTable("BatchXmlMessages", (string)null);
                 });
 
             modelBuilder.Entity("MiniMes.Core.Models.Recipe", b =>
@@ -130,6 +175,70 @@ namespace MiniMes.Data.Migrations
                     b.ToTable("RecipeIngredient");
                 });
 
+            modelBuilder.Entity("MiniMes.Core.Models.Tank", b =>
+                {
+                    b.Property<string>("Container")
+                        .HasMaxLength(1)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("CapacityKg")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("LevelKg")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MaterialName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Container");
+
+                    b.ToTable("Tanks");
+                });
+
+            modelBuilder.Entity("MiniMes.Core.Models.TankMovement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("BatchId")
+                        .HasMaxLength(30)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Container")
+                        .IsRequired()
+                        .HasMaxLength(1)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("DeltaKg")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("LevelAfterKg")
+                        .HasPrecision(10, 3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BatchId");
+
+                    b.HasIndex("TimestampUtc");
+
+                    b.ToTable("TankMovements");
+                });
+
             modelBuilder.Entity("MiniMes.Core.Models.Batch", b =>
                 {
                     b.HasOne("MiniMes.Core.Models.Recipe", "Recipe")
@@ -150,6 +259,15 @@ namespace MiniMes.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MiniMes.Core.Models.BatchXmlMessage", b =>
+                {
+                    b.HasOne("MiniMes.Core.Models.Batch", null)
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MiniMes.Core.Models.RecipeIngredient", b =>
                 {
                     b.HasOne("MiniMes.Core.Models.Recipe", null)
@@ -157,6 +275,14 @@ namespace MiniMes.Data.Migrations
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MiniMes.Core.Models.TankMovement", b =>
+                {
+                    b.HasOne("MiniMes.Core.Models.Batch", null)
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("MiniMes.Core.Models.Recipe", b =>

@@ -4,6 +4,11 @@
     <ProjectReference Include="..\MiniMes.Core\MiniMes.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Compile the XSD into the DLL so the validator always finds it, wherever the app runs. -->
+    <EmbeddedResource Include="BatchSchema.xsd" LogicalName="BatchSchema.xsd" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
