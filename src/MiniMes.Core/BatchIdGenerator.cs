@@ -1,6 +1,6 @@
 namespace MiniMes.Core;
 
-/// <summary>Batch IDs look like B-20261016-001: prefix, UTC date, daily sequence number.</summary>
+/// <summary>Batch IDs look like B-20261016-001: prefix, UTC date, and a global sequence number that never resets.</summary>
 public static class BatchIdGenerator
 {
     /// <summary>The part shared by all IDs of one day, e.g. "B-20261016-".</summary>

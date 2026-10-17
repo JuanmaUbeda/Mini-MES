@@ -25,7 +25,9 @@ public class BatchService
             ?? throw new DomainException($"Recipe {recipeId} does not exist.");
 
         var now = _time.GetUtcNow().UtcDateTime;
-        var batchId = await NextBatchIdAsync(now);
+        // The counter and the batch commit together: if validation or the save fails, the number is rolled back.
+        await using var tx = await _db.Database.BeginTransactionAsync();
+        var batchId = BatchIdGenerator.Format(now, await NextBatchNumberAsync());
 
         var batch = new Batch(batchId, recipe, plannedQuantityKg, now); // validates quantity
         _db.Batches.Add(batch);
@@ -33,6 +35,7 @@ public class BatchService
             $"Batch created: {recipe.Name}, {plannedQuantityKg} kg planned.", now));
 
         await _db.SaveChangesAsync();
+        await tx.CommitAsync();
         return batch;
     }
 
@@ -207,12 +210,15 @@ public class BatchService
         await _db.Batches.SingleOrDefaultAsync(b => b.BatchId == batchId)
             ?? throw new DomainException($"Batch {batchId} does not exist.");
 
-    private async Task<string> NextBatchIdAsync(DateTime now)
+    /// <summary>
+    /// Takes the next number from the persistent global counter. Must run inside a transaction: the UPDATE
+    /// takes SQLite's write lock, so two requests can never receive the same number.
+    /// </summary>
+    private async Task<int> NextBatchNumberAsync()
     {
-        var prefix = BatchIdGenerator.PrefixFor(now);
-        var todaysIds = await _db.Batches.Where(b => b.BatchId.StartsWith(prefix))
-            .Select(b => b.BatchId).ToListAsync();
-        var last = todaysIds.Select(BatchIdGenerator.ParseSequence).Max() ?? 0;
-        return BatchIdGenerator.Format(now, last + 1);
+        const string name = SequenceCounter.BatchName;
+        await _db.Database.ExecuteSqlInterpolatedAsync($"INSERT OR IGNORE INTO Counters (Name, Value) VALUES ({name}, 0)");
+        await _db.Database.ExecuteSqlInterpolatedAsync($"UPDATE Counters SET Value = Value + 1 WHERE Name = {name}");
+        return (int)await _db.Database.SqlQuery<long>($"SELECT Value FROM Counters WHERE Name = {name}").SingleAsync();
     }
 }

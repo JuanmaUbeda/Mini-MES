@@ -54,7 +54,7 @@ public class BatchServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateBatch_AssignsSequentialIdsWithinADay()
+    public async Task CreateBatch_AssignsSequentialIds()
     {
         var recipeId = await FirstRecipeIdAsync();
         using var db = CreateContext();
@@ -68,17 +68,30 @@ public class BatchServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task CreateBatch_RestartsSequenceOnANewDay()
+    public async Task CreateBatch_KeepsCountingAcrossDaysAndNewContexts()
+    {
+        var recipeId = await FirstRecipeIdAsync();
+        using (var db = CreateContext())
+            await new BatchService(db, _time).CreateBatchAsync(recipeId, 100m);
+
+        _time.Set(new DateTime(2026, 10, 17, 8, 0, 0, DateTimeKind.Utc));
+        using var db2 = CreateContext(); // simulates an application restart
+        var next = await new BatchService(db2, _time).CreateBatchAsync(recipeId, 100m);
+
+        Assert.Equal("B-20261017-002", next.BatchId);
+    }
+
+    [Fact]
+    public async Task CreateBatch_DoesNotConsumeANumberWhenItFails()
     {
         var recipeId = await FirstRecipeIdAsync();
         using var db = CreateContext();
         var service = new BatchService(db, _time);
-        await service.CreateBatchAsync(recipeId, 100m);
 
-        _time.Set(new DateTime(2026, 10, 17, 8, 0, 0, DateTimeKind.Utc));
-        var next = await service.CreateBatchAsync(recipeId, 100m);
+        await Assert.ThrowsAsync<DomainException>(() => service.CreateBatchAsync(recipeId, 0m));
+        var first = await service.CreateBatchAsync(recipeId, 100m);
 
-        Assert.Equal("B-20261017-001", next.BatchId);
+        Assert.Equal("B-20261016-001", first.BatchId);
     }
 
     [Fact]

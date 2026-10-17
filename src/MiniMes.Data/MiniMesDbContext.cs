@@ -14,6 +14,7 @@ public class MiniMesDbContext : DbContext
     public DbSet<BatchXmlMessage> XmlMessages => Set<BatchXmlMessage>();
     public DbSet<Tank> Tanks => Set<Tank>();
     public DbSet<TankMovement> TankMovements => Set<TankMovement>();
+    public DbSet<SequenceCounter> Counters => Set<SequenceCounter>();
 
     // SQLite doesn't remember that a DateTime is UTC; mark every date as UTC when reading it back,
     // so the API returns "...Z" and clients can't mistake it for local time.
@@ -100,6 +101,13 @@ public class MiniMesDbContext : DbContext
             e.Property(m => m.BatchId).HasMaxLength(30);
             e.HasOne<Batch>().WithMany().HasForeignKey(m => m.BatchId).IsRequired(false).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(m => m.TimestampUtc);
+        });
+
+        modelBuilder.Entity<SequenceCounter>(e =>
+        {
+            e.ToTable("Counters");
+            e.HasKey(c => c.Name);
+            e.Property(c => c.Name).HasMaxLength(50);
         });
 
         modelBuilder.Entity<BatchEvent>(e =>

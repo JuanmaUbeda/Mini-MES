@@ -175,6 +175,20 @@ namespace MiniMes.Data.Migrations
                     b.ToTable("RecipeIngredient");
                 });
 
+            modelBuilder.Entity("MiniMes.Core.Models.SequenceCounter", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("Value")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("Counters", (string)null);
+                });
+
             modelBuilder.Entity("MiniMes.Core.Models.Tank", b =>
                 {
                     b.Property<string>("Container")
